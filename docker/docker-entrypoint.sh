@@ -15,7 +15,12 @@ case $1 in
 		git submodule sync --recursive
 		git submodule update --init --recursive
 		cd keyboards/ergodox
-		make infinity-default
-		cp ../../*.hex /workspace/
+		mkdir keymaps/layout000
+		cp /workspace/keymap.c keymaps/layout000/
+		cp /workspace/visualizer.c keymaps/layout000/
+		make infinity-layout000
+		mv ../../ergodox_infinity_layout000.hex /workspace/Layout000_LEFT.hex
+		make infinity-layout000 MASTER=right
+		mv ../../ergodox_infinity_layout000.hex /workspace/Layout000_RIGHT.hex
 		;;
 esac
