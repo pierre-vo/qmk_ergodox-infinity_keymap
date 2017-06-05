@@ -24,8 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // stopped. This can be done by either double buffering it or by using constant strings
 static void get_visualizer_layer_and_color(visualizer_state_t* state) {
     uint8_t saturation = 60;
+    uint8_t brightness = 0;
     if (state->status.leds & (1u << USB_LED_CAPS_LOCK)) {
         saturation = 255;
+        brightness = 255;
     }
     if (state->status.layer & 0x4) {
         state->target_lcd_color = LCD_COLOR(0, saturation, 0xFF);
@@ -36,7 +38,7 @@ static void get_visualizer_layer_and_color(visualizer_state_t* state) {
         state->layer_text = "Symbol";
     }
     else {
-        state->target_lcd_color = LCD_COLOR(84, saturation, 0xFF);
+        state->target_lcd_color = LCD_COLOR(84, saturation, brightness);
         state->layer_text = "Default";
     }
 }
