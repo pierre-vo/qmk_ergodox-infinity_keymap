@@ -1,0 +1,12 @@
+SERIAL_LINK_ENABLE = yes
+VISUALIZER_ENABLE = yes
+LCD_ENABLE = yes
+LED_ENABLE = no
+LCD_BACKLIGHT_ENABLE = yes
+MIDI_ENABLE = no
+RGBLIGHT_ENABLE = no
+# RGBLIGHT_ANIMATION = no
+
+ifndef QUANTUM_DIR
+	include ../../../../Makefile
+endif
