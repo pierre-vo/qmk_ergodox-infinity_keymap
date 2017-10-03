@@ -19,6 +19,10 @@
 #include "action_layer.h"
 #include "version.h"
 
+#define LONGPRESS_DELAY 150
+#define LAYER_TOGGLE_DELAY 300
+#define LAYER_SKIP_DELAY 1000
+
 /* Fillers to make layering more clear */
 #define _______ KC_TRNS
 #define ___T___ _______
@@ -33,11 +37,26 @@ enum layers {
 
 enum custom_keycodes {
   PLACEHOLDER = SAFE_RANGE, /* can always be here */
+  LOWER,
+  RAISE,
   EPRM,
   VRSN,
   RST,
+  KMAP,
   RGB_SLD
 };
+
+/* Tap Dance Declarations */
+enum {
+  SCL = 0,
+  QUO,
+};
+
+
+/* Short forms for keycodes so that they fit into limited-width cells */
+#define ALTSHFT LALT(KC_LSFT)
+#define ALTSLSH ALGR_T(KC_SLSH)
+#define SFTBSLS MT(MOD_RSFT, KC_BSLS)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 0: Basic layer
@@ -65,20 +84,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // Otherwise, it needs KC_*
 [BASE] = KEYMAP(  // layer 0 : default
         // left hand
-        KC_GRV,         KC_1,         KC_2,   KC_3,   KC_4,   KC_5,   KC_ESC,
-        KC_TAB,         KC_Q,         KC_W,   KC_E,   KC_R,   KC_T,   TG(SYMB),
-        KC_DELT,        KC_A,         KC_S,   KC_D,   KC_F,   KC_G,
-        KC_LSFT,        CTL_T(KC_Z),  KC_X,   KC_C,   KC_V,   KC_B,   ALL_T(KC_NO),
-        KC_LCTL,        KC_LALT,      LALT(KC_LSFT),  KC_LGUI,KC_LBRC,
+        KC_GRV,  KC_1,         KC_2,    KC_3,   KC_4,   KC_5,   KC_ESC,
+        KC_TAB,  KC_Q,         KC_W,    KC_E,   KC_R,   KC_T,   KC_LBRC,
+        KC_DELT, KC_A,         KC_S,    KC_D,   KC_F,   KC_G,
+        KC_LSFT, CTL_T(KC_Z),  KC_X,    KC_C,   KC_V,   KC_B,   ALL_T(KC_NO),
+        KC_LCTL, KC_LGUI,      ALTSHFT, KC_LALT,LOWER,
                                               ALT_T(KC_APP),  KC_ENT,
                                                               KC_HOME,
                                                KC_SPC,KC_BSPC,KC_END,
         // right hand
-             KC_BSPC,     KC_6,   KC_7,   KC_8,   KC_9,   KC_0,             KC_MINS,
-             KC_FN1,      KC_Y,   KC_U,   KC_I,   KC_O,   KC_P,             KC_EQL,
-                          KC_H,   KC_J,   KC_K,   KC_L,   LT(MDIA, KC_SCLN),GUI_T(KC_QUOT),
-             MEH_T(KC_NO),KC_N,   KC_M,   KC_COMM,KC_DOT, KC_UP,            KC_BSLS,
-                                  KC_RBRC,KC_SLSH,KC_LEFT,KC_DOWN,          KC_RGHT,
+             KC_BSPC,     KC_6,   KC_7,   KC_8,   KC_9,   KC_0,     KC_MINS,
+             KC_RBRC,     KC_Y,   KC_U,   KC_I,   KC_O,   KC_P,     KC_EQL,
+                          KC_H,   KC_J,   KC_K,   KC_L,   TD(SCL),  TD(QUO),
+             MEH_T(KC_NO),KC_N,   KC_M,   KC_COMM,KC_DOT, KC_UP,    SFTBSLS,
+                                  RAISE,  ALTSLSH,KC_LEFT,KC_DOWN,    KC_RGHT,
              KC_LALT,        CTL_T(KC_ESC),
              KC_PGUP,
              KC_PGDN,KC_TAB, KC_ENT
@@ -88,13 +107,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,---------------------------------------------------.           ,--------------------------------------------------.
  * |Version  |  F1  |  F2  |  F3  |  F4  |  F5  |      |           |      |  F6  |  F7  |  F8  |  F9  |  F10 |   F11  |
  * |---------+------+------+------+------+------+------|           |------+------+------+------+------+------+--------|
- * |         |   !  |   @  |   {  |   }  |   |  |      |           |      |   Up |   7  |   8  |   9  |   *  |   F12  |
+ * |         |   !  |   @  |   [  |   ]  |   |  |      |           |      |   Up |   7  |   8  |   9  |   *  |   F12  |
  * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
  * |         |   #  |   $  |   (  |   )  |   `  |------|           |------| Down |   4  |   5  |   6  |   +  |        |
  * |---------+------+------+------+------+------| Rst  |           | Rst  |------+------+------+------+------+--------|
- * |         |   %  |   ^  |   [  |   ]  |   ~  |      |           |      |   &  |   1  |   2  |   3  |   \  |        |
+ * |         |   %  |   ^  |   {  |   }  |   ~  |      |           |      |   &  |   1  |   2  |   3  |   \  |        |
  * `---------+------+------+------+------+-------------'           `-------------+------+------+------+------+--------'
- *   | EPRM  |      |      |      |      |                                       |      |    . |   0  |   =  |      |
+ *   | EPRM  |      |      |      |      |                                       |   0  |    . |   0  |   =  |      |
  *   `-----------------------------------'                                       `----------------------------------'
  *                                        ,-------------.       ,-------------.
  *                                        |      |      |       |      |      |
@@ -107,20 +126,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // SYMBOLS
 [SYMB] = KEYMAP(
        // left hand
-       VRSN,   KC_F1,  KC_F2,  KC_F3,  KC_F4,  KC_F5,  _______,
-       _______,KC_EXLM,KC_AT,  KC_LCBR,KC_RCBR,KC_PIPE,_______,
+       _______,KC_F1,  KC_F2,  KC_F3,  KC_F4,  KC_F5,  _______,
+       _______,KC_EXLM,KC_AT,  KC_LBRC,KC_RBRC,KC_PIPE,_______,
        _______,KC_HASH,KC_DLR, KC_LPRN,KC_RPRN,KC_GRV,
-       _______,KC_PERC,KC_CIRC,KC_LBRC,KC_RBRC,KC_TILD,RST,
-          EPRM,_______,_______,_______,_______,
-                                       _______,_______,
+       _______,KC_PERC,KC_CIRC,KC_LCBR,KC_RCBR,KC_TILD,_______,
+          EPRM,_______,_______,_______,___T___,
+                                       _______,RST,
                                                _______,
                                _______,_______,_______,
        // right hand
        _______, KC_F6,   KC_F7,  KC_F8,   KC_F9,   KC_F10,  KC_F11,
        _______, KC_UP,   KC_7,   KC_8,    KC_9,    KC_ASTR, KC_F12,
                 KC_DOWN, KC_4,   KC_5,    KC_6,    KC_PLUS, _______,
-           RST, KC_AMPR, KC_1,   KC_2,    KC_3,    KC_BSLS, _______,
-                         _______,KC_DOT,  KC_0,    KC_EQL,  _______,
+       _______, KC_AMPR, KC_1,   KC_2,    KC_3,    KC_BSLS, _______,
+                         KC_0,   KC_DOT,  KC_0,    KC_EQL,  _______,
        _______, _______,
        _______,
        _______, _______, _______
@@ -148,29 +167,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 // MEDIA AND MOUSE
 [MDIA] = KEYMAP(
-       _______, _______, _______, _______, _______, _______, _______,
+       KC_ACL0, KC_ACL1, KC_ACL2, _______, _______, _______, _______,
        _______, _______, _______, KC_MS_U, _______, _______, _______,
        _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, _______,
-       _______, _______, _______, _______, _______, _______, _______,
-       _______, _______, _______, KC_BTN1, KC_BTN2,
+       VRSN,    _______, _______, _______, _______, _______, _______,
+       RST,     KMAP,    _______, _______, XXXXXXX,
                                            _______, _______,
                                                     _______,
                                   _______, _______, _______,
     // right hand
-       _______,  _______, _______, _______, _______, _______, _______,
-       _______,  _______, _______, _______, _______, _______, _______,
-                 _______, _______, _______, _______, _______, KC_MPLY,
-       _______,  _______, _______, KC_MPRV, KC_MNXT, _______, _______,
-                          KC_VOLU, KC_VOLD, KC_MUTE, _______, _______,
-       _______, _______,
+       _______,  _______, KC_MPRV, KC_MNXT, _______, _______, _______,
+       _______,  _______, KC_WBAK, KC_WFWD, _______, KC_MPLY, _______,
+                 _______, KC_BTN1, KC_BTN2, _______, _______, _______,
+       _______,  _______, KC_VOLD, KC_VOLU, KC_MUTE, _______, _______,
+                          ___T___, _______, _______, _______, _______,
+       RST,     _______,
        _______,
-       _______, _______, KC_WBAK
+       _______, _______, _______
 ),
 };
 
-const uint16_t PROGMEM fn_actions[] = {
-    [1] = ACTION_LAYER_TAP_TOGGLE(SYMB)                // FN1 - Momentary Layer 1 (Symbols)
-};
+//const uint16_t PROGMEM fn_actions[] = {
+//    [1] = ACTION_LAYER_TAP_TOGGLE(SYMB)                // FN1 - Momentary Layer 1 (Symbols)
+//};
 
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
@@ -190,22 +209,13 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     return MACRO_NONE;
 };
 
+static uint16_t key_timer;
+static bool singular_key = false;
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  switch (keycode) {
+/*  switch (keycode) {
     // dynamically generate these.
-    case EPRM:
-      if (record->event.pressed) {
-        eeconfig_init();
-      }
-      return false;
-      break;
-    case VRSN:
-      if (record->event.pressed) {
-        SEND_STRING (QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
-      }
-      return false;
-      break;
-    case RGB_SLD:
+     case RGB_SLD:
       if (record->event.pressed) {
         #ifdef RGBLIGHT_ENABLE
           rgblight_mode(1);
@@ -219,7 +229,134 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
   }
   return true;
+  */
+//  static uint8_t skip = false;  /* if true: we do not restore the RGB state */
+
+  switch (keycode) {
+    // dynamically generate these.
+    case VRSN:
+      if (record->event.pressed) {
+        SEND_STRING(QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
+      }
+      return false;
+      break;
+
+    case EPRM:
+      if (record->event.pressed) {
+        eeconfig_init();
+      }
+      return false;
+      break;
+
+    case KMAP:
+      if (record->event.pressed) {
+        SEND_STRING("http://www.keyboard-layout-editor.com/#/gists/9dd2c2bd6f1120685ee810303563c7f5");
+      }
+      return false;
+      break;
+
+     case LOWER:
+      if (record->event.pressed) {
+        key_timer = timer_read();
+        singular_key = true;
+        layer_on(SYMB);
+
+/*        if (biton32(layer_state) == _QW) {
+          RGB_current_mode = rgblight_get_mode();
+        }
+        rgblight_mode(1);
+        rgblight_setrgb(0x00, 0xA0, 0xFF); */
+      } else if (timer_elapsed(key_timer) < LAYER_TOGGLE_DELAY
+          || timer_elapsed(key_timer) > LAYER_SKIP_DELAY
+          || !singular_key) {
+        layer_off(SYMB);
+/*        if (skip) {
+           RGB_current_mode = rgblight_get_mode();
+           skip = false;
+         } else {
+           rgblight_mode(RGB_current_mode);
+         }*/
+      }
+      return false;
+      break;
+
+    case RAISE:
+      if (record->event.pressed) {
+        key_timer = timer_read();
+        singular_key = true;
+        layer_on(MDIA);
+
+/*        if (biton32(layer_state) == _QW) {
+          RGB_current_mode = rgblight_get_mode();
+        }
+        rgblight_mode(1);
+        rgblight_setrgb(0xFF, 0x00, 0x00); */
+      } else if (timer_elapsed(key_timer) < LAYER_TOGGLE_DELAY
+          || timer_elapsed(key_timer) > LAYER_SKIP_DELAY
+          || !singular_key) {
+        layer_off(MDIA);
+/*        if (skip) {
+           RGB_current_mode = rgblight_get_mode();
+           skip = false;
+         } else {
+           rgblight_mode(RGB_current_mode);
+         }*/
+       }
+      return false;
+      break;
+
+/*    case FUNC:
+      if (record->event.pressed) {
+        key_timer = timer_read();
+        singular_key = true;
+        layer_on(_FN);
+
+        if (!skip)
+        {
+          if (biton32(layer_state) == _QW) {
+            RGB_current_mode = rgblight_get_mode();
+          }
+          rgblight_mode(1);
+          rgblight_setrgb(0xFF, 0x20, 0x00);
+        }
+      } else if (timer_elapsed(key_timer) < LAYER_TOGGLE_DELAY
+          || timer_elapsed(key_timer) > LAYER_SKIP_DELAY
+          || !singular_key) {
+        layer_off(_FN);
+        if (skip) {
+          RGB_current_mode = rgblight_get_mode();
+          skip = false;
+        } else {
+          rgblight_mode(RGB_current_mode);
+        }
+      }
+      return false;
+      break;*/
+
+    case RST:
+      reset_keyboard();
+      return false;
+      break;
+
+    /* If any other key was pressed during the layer mod hold period,
+     * then the layer mod was used momentarily, and should block latching */
+    default:
+      singular_key = false;
+      break;
+   }
+  return true;
+  
 }
+
+/* Tap Dance Definitions */
+qk_tap_dance_action_t tap_dance_actions[] = {
+  /* Shifting for double quote and semicolon */
+  [SCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_COLN),
+  [QUO] = ACTION_TAP_DANCE_DOUBLE(KC_QUOT, KC_DQUO),
+
+    // complex tap dance function (to specify what happens when key is pressed 3+ times, for example). See https://docs.qmk.fm/tap_dance.html for how to define
+    //[YOUR_TAPDANCE_2] = ACTION_TAP_DANCE_FN(your_function_name),0
+};
 
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) {
@@ -229,7 +366,7 @@ void matrix_init_user(void) {
 
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
-
+/*
     uint8_t layer = biton32(layer_state);
 
     ergodox_board_led_off();
@@ -248,5 +385,5 @@ void matrix_scan_user(void) {
             // none
             break;
     }
-
+*/
 };

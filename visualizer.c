@@ -23,10 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Also make sure that the buffer passed to state->layer_text remains valid until the previous animation is
 // stopped. This can be done by either double buffering it or by using constant strings
 static void get_visualizer_layer_and_color(visualizer_state_t* state) {
-    uint8_t saturation = 60;
+    uint8_t saturation = 255;
     uint8_t brightness = 0;
     if (state->status.leds & (1u << USB_LED_CAPS_LOCK)) {
-        saturation = 255;
+        saturation = 60;
         brightness = 255;
     }
     if (state->status.layer & 0x4) {
