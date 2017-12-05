@@ -15,9 +15,14 @@
  */
 
 #include QMK_KEYBOARD_H
-#include "debug.h"
+//#include "debug.h"
 #include "action_layer.h"
+//#include "action_util.h"
+#include "timer.h"
+#include "eeconfig.h"
+#include "wait.h"
 #include "version.h"
+
 
 #define LONGPRESS_DELAY 150
 #define LAYER_TOGGLE_DELAY 300
@@ -236,7 +241,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // dynamically generate these.
     case VRSN:
       if (record->event.pressed) {
-        SEND_STRING(QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
+        //SEND_STRING(QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
+        SEND_STRING(QMK_KEYBOARD "/" QMK_KEYMAP " @ (" QMK_VERSION "/" LAYOUT_ergodox_VERSION ")");
       }
       return false;
       break;
@@ -360,7 +366,10 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) {
+  set_unicode_input_mode(UC_LNX);
 
+  if (!eeconfig_is_enabled())
+    eeconfig_init();
 };
 
 
@@ -387,3 +396,21 @@ void matrix_scan_user(void) {
     }
 */
 };
+
+
+const qk_ucis_symbol_t ucis_symbol_table[] = UCIS_TABLE
+(
+ UCIS_SYM("poop", 0x1f4a9),
+ UCIS_SYM("rofl", 0x1f923),
+ UCIS_SYM("kiss", 0x1f619),
+ UCIS_SYM("snowman", 0x2603),
+ UCIS_SYM("coffee", 0x2615),
+ UCIS_SYM("heart", 0x2764),
+ UCIS_SYM("bolt", 0x26a1),
+ UCIS_SYM("pi", 0x03c0),
+ UCIS_SYM("mouse", 0x1f401),
+ UCIS_SYM("micro", 0x00b5),
+ UCIS_SYM("tm", 0x2122),
+ UCIS_SYM("child", 0x1f476),
+ UCIS_SYM("family", 0x1F46A)
+);
