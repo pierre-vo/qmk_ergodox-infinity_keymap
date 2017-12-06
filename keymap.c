@@ -203,22 +203,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
-{
+const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt) {
   // MACRODOWN only works in this function
-      switch(id) {
-        case 0:
-        if (record->event.pressed) {
-          SEND_STRING (QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
-        }
-        break;
-        case 1:
-        if (record->event.pressed) { // For resetting EEPROM
-          eeconfig_init();
-        }
-        break;
+  switch(id) {
+    case 0:
+      if (record->event.pressed) {
+        SEND_STRING (QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
       }
-    return MACRO_NONE;
+
+      break;
+
+    case 1:
+      if (record->event.pressed) { // For resetting EEPROM
+        eeconfig_init();
+      }
+
+      break;
+  }
+
+  return MACRO_NONE;
 };
 
 static uint16_t key_timer;
@@ -233,6 +236,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         //SEND_STRING(QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
         SEND_STRING(QMK_KEYBOARD "/" QMK_KEYMAP " @ (" QMK_VERSION "/" LAYOUT_ergodox_VERSION ")");
       }
+
       return false;
       break;
 
@@ -240,6 +244,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         eeconfig_init();
       }
+
       return false;
       break;
 
@@ -247,20 +252,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         SEND_STRING("http://www.keyboard-layout-editor.com/#/gists/9dd2c2bd6f1120685ee810303563c7f5");
       }
+
       return false;
       break;
 
-     case LOWER:
+    case LOWER:
       if (record->event.pressed) {
         key_timer = timer_read();
         singular_key = true;
         layer_on(SYMB);
 
       } else if (timer_elapsed(key_timer) < LAYER_TOGGLE_DELAY
-          || timer_elapsed(key_timer) > LAYER_SKIP_DELAY
-          || !singular_key) {
+                 || timer_elapsed(key_timer) > LAYER_SKIP_DELAY
+                 || !singular_key) {
         layer_off(SYMB);
       }
+
       return false;
       break;
 
@@ -271,10 +278,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         layer_on(MDIA);
 
       } else if (timer_elapsed(key_timer) < LAYER_TOGGLE_DELAY
-          || timer_elapsed(key_timer) > LAYER_SKIP_DELAY
-          || !singular_key) {
+                 || timer_elapsed(key_timer) > LAYER_SKIP_DELAY
+                 || !singular_key) {
         layer_off(MDIA);
-       }
+      }
+
       return false;
       break;
 
@@ -291,7 +299,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   }
 
   return true;
-  
+
 }
 
 /* Tap Dance Definitions */
@@ -300,8 +308,8 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [SCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_COLN),
   [QUO] = ACTION_TAP_DANCE_DOUBLE(KC_QUOT, KC_DQUO),
 
-  /* complex tap dance function (to specify what happens when key is 
-   * pressed 3+ times, for example). See 
+  /* complex tap dance function (to specify what happens when key is
+   * pressed 3+ times, for example). See
    * https://docs.qmk.fm/tap_dance.html for how to define
   [YOUR_TAPDANCE_2] = ACTION_TAP_DANCE_FN(your_function_name),0
   */
@@ -350,10 +358,10 @@ void matrix_init_user(void) {
   if (!eeconfig_is_enabled())
     eeconfig_init();
 
-/*#ifdef RGBLIGHT_ENABLE
-  rgblight_init();
-  RGB_current_mode = rgblight_get_mode();
-#endif */ /* RGBLIGHT_ENABLE */
+  /*#ifdef RGBLIGHT_ENABLE
+    rgblight_init();
+    RGB_current_mode = rgblight_get_mode();
+  #endif */ /* RGBLIGHT_ENABLE */
 }
 
 
@@ -364,18 +372,18 @@ void matrix_scan_user(void) {
 
 
 const qk_ucis_symbol_t ucis_symbol_table[] = UCIS_TABLE
-(
- UCIS_SYM("poop", 0x1f4a9),
- UCIS_SYM("rofl", 0x1f923),
- UCIS_SYM("kiss", 0x1f619),
- UCIS_SYM("snowman", 0x2603),
- UCIS_SYM("coffee", 0x2615),
- UCIS_SYM("heart", 0x2764),
- UCIS_SYM("bolt", 0x26a1),
- UCIS_SYM("pi", 0x03c0),
- UCIS_SYM("mouse", 0x1f401),
- UCIS_SYM("micro", 0x00b5),
- UCIS_SYM("tm", 0x2122),
- UCIS_SYM("child", 0x1f476),
- UCIS_SYM("family", 0x1F46A)
-);
+    (
+      UCIS_SYM("poop", 0x1f4a9),
+      UCIS_SYM("rofl", 0x1f923),
+      UCIS_SYM("kiss", 0x1f619),
+      UCIS_SYM("snowman", 0x2603),
+      UCIS_SYM("coffee", 0x2615),
+      UCIS_SYM("heart", 0x2764),
+      UCIS_SYM("bolt", 0x26a1),
+      UCIS_SYM("pi", 0x03c0),
+      UCIS_SYM("mouse", 0x1f401),
+      UCIS_SYM("micro", 0x00b5),
+      UCIS_SYM("tm", 0x2122),
+      UCIS_SYM("child", 0x1f476),
+      UCIS_SYM("family", 0x1F46A)
+    );
